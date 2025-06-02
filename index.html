@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekrem Arda Gümüş</title>
+    <style>
+        /* Genel sıfırlamalar */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Başlık (title) stil ve animasyonları */
+        header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 5rem;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            animation: fadeInZoom 1.5s ease-out;
+            transition: font-size 0.3s ease-out;
+            z-index: 10;
+        }
+
+        /* Sticky durumda başlığın boyut değiştirme efekti */
+        header.sticky {
+            font-size: 3rem;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* İçerik bölümü (örnek metin) */
+        .content {
+            background-color: #111;
+            padding: 2rem;
+        }
+        .content p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        /* Fade-in ve zoom efektleri */
+        @keyframes fadeInZoom {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Başlık bölümü -->
+    <header id="main-header">Ekrem Arda Gümüş</header>
+
+    <!-- İçerik, sayfa kaydırıldığında başlığın yapışmasını test etmek için örnek metin -->
+    <div class="content">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent hendrerit urna nec lorem commodo, vitae vulputate tortor faucibus. Sed quis urna non ex rutrum tincidunt. Curabitur dignissim velit sit amet ipsum malesuada scelerisque.</p>
+        <p>Vestibulum vitae massa sit amet neque faucibus feugiat. Integer non dignissim tortor. Aliquam erat volutpat. Nullam et ex et risus venenatis interdum. Nam euismod odio vel turpis dignissim, quis sodales purus sodales.</p>
+        <p>Morbi sit amet purus sed enim scelerisque laoreet. Nulla facilisi. Vivamus vel tellus vitae sapien consequat egestas. Duis bibendum urna ac lectus suscipit, a vestibulum sapien elementum.</p>
+        <p>Fusce euismod, sapien in finibus dapibus, velit ligula vehicula metus, at pellentesque eros orci id mi. Quisque id orci nec lacus scelerisque dictum nec sit amet purus. Integer vehicula pretium dolor, ac dapibus ligula blandit non.</p>
+        <p>Donec ullamcorper nibh elit, vitae commodo lacus consequat quis. Aenean euismod lorem vitae dolor sodales, non vestibulum elit dignissim. Mauris suscipit, turpis elementum maximus aliquet, urna nisl vulputate nunc, ac tempus mi felis sed nibh.</p>
+        <p>Suspendisse potenti. Curabitur suscipit massa non sapien facilisis convallis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Phasellus et ipsum vitae lorem bibendum hendrerit.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ac nulla sed augue fringilla luctus. Curabitur at metus vehicula, pharetra massa eget, tempus sapien.</p>
+        <p>Ut feugiat semper risus, vitae porttitor erat convallis eget. Integer ut arcu at ipsum elementum ultrices non nec nibh.</p>
+    </div>
+
+    <!-- JavaScript: Kaydırma olayını dinleyerek başlığa sticky sınıfı ekleme/çıkarma -->
+    <script>
+        document.addEventListener('scroll', function() {
+            const header = document.getElementById('main-header');
+            // Sayfa kaydırıldığında header yüksekliğinin yarısından fazlası geçildiyse "sticky" sınıfı ekle
+            if (window.scrollY > window.innerHeight / 2) {
+                header.classList.add('sticky');
+            } else {
+                header.classList.remove('sticky');
+            }
+        });
+    </script>
+</body>
+</html>
