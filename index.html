@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ekrem Arda Gümüş</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: #000000;
             color: #ffffff;
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden; /* Prevents horizontal scrollbar from blur */
+            overflow-x: hidden;
             margin: 0;
         }
         #backgroundCanvas {
@@ -20,75 +20,213 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0; /* Behind the text */
-            filter: blur(60px); /* Heavy blur effect */
-            opacity: 0.85; /* Increased opacity for the circles layer */
+            z-index: 0;
+            filter: blur(60px);
+            opacity: 0.85;
         }
         #textContainer {
             position: fixed;
             inset: 0;
             z-index: 10;
             display: flex;
-            align-items: flex-start; /* Always align to start, JS will handle padding for centering/top */
-            justify-content: center; /* Horizontal centering */
+            align-items: flex-start; /* JS handles padding for vertical animation */
+            justify-content: center;
             pointer-events: none;
-            /* padding-top will be set by JS for smooth animation */
-            /* transition property removed to let JS control animation smoothly */
         }
         #mainText {
-            font-weight: 600;
+            font-weight: 900;
             text-align: center;
             color: white;
-            font-size: 4rem; /* Base fallback, will be set by media query or JS */
-            /* transition: font-size removed as JS handles it smoothly */
-        }
-        /* Responsive initial font sizes (before scroll) */
-        @media (min-width: 640px) { /* sm */
-            #mainText { font-size: 6rem; }
-        }
-        @media (min-width: 768px) { /* md */
-            #mainText { font-size: 8rem; }
-        }
-        @media (min-width: 1024px) { /* lg */
-            #mainText { font-size: 10rem; }
+            white-space: nowrap; /* Keep text on one line for measurement */
+            /* Initial font-size will be dynamically calculated by JS */
         }
 
-        /* Target font sizes when scrolled (JS will interpolate to these values) */
-        /* These CSS rules for body.scrolled #mainText are effectively reference points for JS,
-           but JS will calculate the pixel values directly. */
-        /* body.scrolled #mainText { font-size: 1.875rem; } ... etc. */
+        /* Dummy scroll content is replaced by actual content section */
+        /* .scroll-content { height: 200vh; pointer-events: auto; } */
 
-        /* Dummy scroll content to make page scrollable */
-        .scroll-content {
-            height: 200vh;
-            pointer-events: auto;
+        #aboutSection {
+            padding-top: 100vh; /* Start content below the initial viewport */
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            min-height: 100vh; /* Ensure it takes up space */
+            pointer-events: auto; /* Allow interaction with this section */
+            margin-top: 50px; /* Space after the hero text settles */
         }
+        #aboutSection.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+        .timeline::after { /* The vertical line */
+            content: '';
+            position: absolute;
+            width: 3px;
+            background-color: #4A5568; /* gray-600 */
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1.5px;
+        }
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+        .timeline-item::after { /* The circles on the timeline */
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: white;
+            border: 4px solid #2b6cb0; /* blue-600 */
+            top: 20px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .timeline-item.left {
+            left: 0;
+        }
+        .timeline-item.right {
+            left: 50%;
+        }
+        .timeline-item.left::before { /* Connector arrows - not strictly needed but good for detail */
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 25px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid white;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent #1A202C; /* gray-900 for card background */
+        }
+        .timeline-item.right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 25px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid white;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent #1A202C transparent transparent;
+        }
+        .timeline-item.right::after {
+            left: -10px;
+        }
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: #1A202C; /* gray-900 */
+            position: relative;
+            border-radius: 8px;
+        }
+        .timeline-content h3 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            color: #63b3ed; /* blue-400 */
+        }
+        .timeline-content p {
+            font-size: 1rem; /* text-base */
+            color: #A0AEC0; /* gray-400 */
+        }
+
+        /* Placeholder for code/software blocks */
+        .code-block-placeholder {
+            border: 2px dashed #4A5568; /* gray-600 */
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            text-align: center;
+            color: #A0AEC0; /* gray-400 */
+        }
+        .code-block-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
     </style>
 </head>
-<body>
+<body class="bg-black text-white">
     <canvas id="backgroundCanvas"></canvas>
     <div id="textContainer">
         <h1 id="mainText">ekrem arda gümüş</h1>
     </div>
 
-    <div class="scroll-content"></div>
+    <div id="aboutSection" class="container mx-auto px-4">
+        <h2 class="text-5xl font-bold text-center mb-12 mt-16">About Me</h2>
+
+        <div class="grid md:grid-cols-2 gap-12 items-start mb-16">
+            <div class="code-block-placeholder">
+                <div class="icon">&lt;code /&gt;</div>
+                <p class="text-xl font-semibold">Software Projects</p>
+                <p class="mt-2 text-sm">Detailed descriptions of various software projects and contributions. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div class="code-block-placeholder">
+                <div class="icon">🎨</div> {/* Example icon */}
+                <p class="text-xl font-semibold">Design & UI/UX</p>
+                <p class="mt-2 text-sm">Exploring user interface design principles and creating intuitive user experiences. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </div>
+        </div>
+
+
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <h3>2009</h3>
+                    <p>Born. The journey begins!</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <h3>2014</h3>
+                    <p>Learnt reading and writing. Unlocked new worlds.</p>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <h3>2023</h3>
+                    <p>LGS Exam. A significant academic milestone.</p>
+                </div>
+            </div>
+             <div class="timeline-item right">
+                <div class="timeline-content">
+                    <h3>Future</h3>
+                    <p>Exploring new technologies and building cool stuff!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         const canvas = document.getElementById('backgroundCanvas');
         const ctx = canvas.getContext('2d');
-        const textContainer = document.getElementById('textContainer'); // Get textContainer
+        const textContainer = document.getElementById('textContainer');
         const mainText = document.getElementById('mainText');
+        const aboutSection = document.getElementById('aboutSection');
         
         let circles = [];
-        const numCircles = 15;
+        const numCircles = 25;
 
-        // Animation parameters
         let initialActualFontSizePx;
         let targetFinalActualFontSizePx;
         let initialPaddingTopPx;
         let finalPaddingTopPx;
 
-        const scrollTransitionRange = 300; // Pixels over which text animation (size and position) occurs
+        const scrollTransitionRange = 300; // Pixels over which text animation occurs
+        let aboutSectionVisible = false;
 
         class Circle {
             constructor(x, y, radius, dx, dy, color) {
@@ -99,7 +237,6 @@
                 this.dy = dy;
                 this.color = color;
             }
-
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -107,14 +244,9 @@
                 ctx.fill();
                 ctx.closePath();
             }
-
             update() {
-                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
-                    this.dx = -this.dx;
-                }
-                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
-                    this.dy = -this.dy;
-                }
+                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) this.dx = -this.dx;
+                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) this.dy = -this.dy;
                 this.x += this.dx;
                 this.y += this.dy;
                 this.draw();
@@ -125,7 +257,6 @@
             circles = [];
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-
             for (let i = 0; i < numCircles; i++) {
                 const radius = Math.random() * 90 + 30;
                 const x = Math.random() * (canvas.width - radius * 2) + radius;
@@ -141,74 +272,81 @@
         function animateCircles() {
             requestAnimationFrame(animateCircles);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            circles.forEach(circle => {
-                circle.update();
-            });
+            circles.forEach(circle => circle.update());
         }
 
         function getTargetFinalFontSizePx() {
             const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
             let targetRem;
-            if (window.innerWidth >= 1024) targetRem = 3;       // lg scrolled
-            else if (window.innerWidth >= 768) targetRem = 3;    // md scrolled
-            else if (window.innerWidth >= 640) targetRem = 2.25; // sm scrolled
-            else targetRem = 1.875;                             // smallest scrolled
+            if (window.innerWidth >= 1024) targetRem = 3;
+            else if (window.innerWidth >= 768) targetRem = 3;
+            else if (window.innerWidth >= 640) targetRem = 2.25;
+            else targetRem = 1.875;
             return targetRem * rootFontSize;
         }
 
+        function calculateMaxInitialFontSize() {
+            let testFontSize = 200; // Start with a large font size
+            mainText.style.fontSize = testFontSize + 'px';
+            // Iteratively reduce font size until it fits within 90% of viewport width
+            while (mainText.scrollWidth > window.innerWidth * 0.90 && testFontSize > 10) {
+                testFontSize -= 1;
+                mainText.style.fontSize = testFontSize + 'px';
+            }
+            return testFontSize;
+        }
+
         function updateTextAnimationParameters() {
-            // --- Font Size Parameters ---
-            mainText.style.fontSize = ''; // Reset inline style to let CSS media queries define the initial size
-            initialActualFontSizePx = parseFloat(getComputedStyle(mainText).fontSize);
+            initialActualFontSizePx = calculateMaxInitialFontSize();
+            mainText.style.fontSize = initialActualFontSizePx + 'px'; // Apply the calculated max size
+            
             targetFinalActualFontSizePx = getTargetFinalFontSizePx();
 
-            // --- Positioning (Padding-Top) Parameters ---
-            // Ensure mainText has its initial font size applied for accurate height measurement
-            mainText.style.fontSize = initialActualFontSizePx + 'px'; 
             const initialMainTextHeight = mainText.offsetHeight;
-
             const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-            finalPaddingTopPx = 2 * rootFontSize; // Target 2rem padding from top
-
-            // Calculate initial padding to center the text vertically
+            finalPaddingTopPx = 2 * rootFontSize; // Target 2rem padding
             initialPaddingTopPx = (window.innerHeight / 2) - (initialMainTextHeight / 2);
-            initialPaddingTopPx = Math.max(0, initialPaddingTopPx); // Ensure padding isn't negative
-
-            // After parameters are set, handleScrollAndResize will apply the correct current styles
+            initialPaddingTopPx = Math.max(0, initialPaddingTopPx);
         }
 
         function handleScrollAndResize() {
             const scrollY = window.scrollY;
             const scrollFraction = Math.min(1, scrollY / scrollTransitionRange);
 
-            // 1. Font size interpolation
             if (initialActualFontSizePx != null && targetFinalActualFontSizePx != null) {
                 let currentPxSize = initialActualFontSizePx - (initialActualFontSizePx - targetFinalActualFontSizePx) * scrollFraction;
                 currentPxSize = Math.max(targetFinalActualFontSizePx, Math.min(initialActualFontSizePx, currentPxSize));
                 mainText.style.fontSize = currentPxSize + 'px';
             }
 
-            // 2. Padding-Top interpolation for textContainer
             if (initialPaddingTopPx != null && finalPaddingTopPx != null) {
                 let currentPaddingTop = initialPaddingTopPx - (initialPaddingTopPx - finalPaddingTopPx) * scrollFraction;
                 currentPaddingTop = Math.max(finalPaddingTopPx, Math.min(initialPaddingTopPx, currentPaddingTop));
                 textContainer.style.paddingTop = currentPaddingTop + 'px';
             }
+
+            // Show About Me section
+            if (scrollY > scrollTransitionRange + 50 && !aboutSectionVisible) { // Add a small buffer
+                aboutSection.classList.add('visible');
+                aboutSectionVisible = true;
+            } else if (scrollY <= scrollTransitionRange + 50 && aboutSectionVisible) {
+                // Optionally hide if scrolled back up, or keep it visible
+                // aboutSection.classList.remove('visible');
+                // aboutSectionVisible = false;
+            }
         }
 
-        // Event Listeners
         window.addEventListener('scroll', handleScrollAndResize);
         window.addEventListener('resize', () => {
-            initCircles(); 
-            updateTextAnimationParameters(); 
-            handleScrollAndResize(); 
+            initCircles();
+            updateTextAnimationParameters();
+            handleScrollAndResize();
         });
 
-        // Initial setup
         initCircles();
-        updateTextAnimationParameters(); // Calculate all necessary animation parameters
+        updateTextAnimationParameters();
         animateCircles();
-        handleScrollAndResize(); // Apply initial styles based on current scroll/size
+        handleScrollAndResize();
     </script>
 </body>
 </html>
