@@ -35,7 +35,7 @@
             pointer-events: none; /* Allows scrolling through the text container */
         }
         #mainText {
-            font-weight: 900; /* Bolder text */
+            font-weight: 600; /* Bolder text */
             text-align: center;
             color: white;
             /* Initial font sizes are set by CSS media queries, JS will override for smooth transition */
@@ -101,7 +101,7 @@
         // Font sizing parameters
         let initialActualFontSizePx;
         let targetFinalActualFontSizePx;
-        const scrollTransitionRange = 300; // Pixels over which font size transition occurs
+        const scrollTransitionRange = 0; // Pixels over which font size transition occurs
         const scrollThreshold = 10; // Pixels to scroll before text container changes position
 
         class Circle {
@@ -141,7 +141,7 @@
             canvas.height = window.innerHeight;
 
             for (let i = 0; i < numCircles; i++) {
-                const radius = Math.random() * 90 + 30; // Radius between 30 and 120
+                const radius = Math.random() * 50 + 100; // Radius between 30 and 120
                 const x = Math.random() * (canvas.width - radius * 2) + radius;
                 const y = Math.random() * (canvas.height - radius * 2) + radius;
                 const dx = (Math.random() - 0.5) * 0.6; // Slightly adjusted speed
