@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ekrem Arda Gümüş</title>
+    <!-- Inter font import -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Genel sıfırlamalar */
         * {
@@ -14,32 +16,35 @@
         html, body {
             height: 100%;
             background-color: #000;
-            font-family: Inter, sans-serif;
+            font-family: 'Inter', sans-serif;
             color: #fff;
             overflow-x: hidden;
         }
 
-        /* Başlık (title) stil ve animasyonları */
+        /* Başlık (title) stil ve başlangıç konumu */
         header {
-            position: sticky;
-            top: 0;
+            position: relative;
+            width: 100%;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            font-size: 5rem;
-            font-weight: bold;
+            font-size: 5rem; /* Büyük boyut */
+            font-weight: 700;
             color: #fff;
             text-align: center;
-            animation: fadeInZoom 1.5s ease-out;
-            transition: font-size 0.3s ease-out;
+            transform-origin: top center;
             z-index: 10;
+            transition: font-size 0.1s ease-out;
         }
 
-        /* Sticky durumda başlığın boyut değiştirme efekti */
+        /* Sticky durumda başlık için sabit pozisyon ve küçük boyut */
         header.sticky {
-            font-size: 3rem;
+            position: sticky;
+            top: 0;
+            font-size: 1.5rem; /* Küçük boyut */
             background: rgba(0, 0, 0, 0.8);
+            padding: 0.5rem 0;
         }
 
         /* İçerik bölümü (örnek metin) */
@@ -52,24 +57,13 @@
             margin-bottom: 1rem;
         }
 
-        /* Fade-in ve zoom efektleri */
-        @keyframes fadeInZoom {
-            0% {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
     </style>
 </head>
 <body>
     <!-- Başlık bölümü -->
     <header id="main-header">Ekrem Arda Gümüş</header>
 
-    <!-- İçerik, sayfa kaydırıldığında başlığın yapışmasını test etmek için örnek metin -->
+    <!-- İçerik, sayfa kaydırıldığında başlığın davranışını test etmek için örnek metin -->
     <div class="content">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent hendrerit urna nec lorem commodo, vitae vulputate tortor faucibus. Sed quis urna non ex rutrum tincidunt. Curabitur dignissim velit sit amet ipsum malesuada scelerisque.</p>
         <p>Vestibulum vitae massa sit amet neque faucibus feugiat. Integer non dignissim tortor. Aliquam erat volutpat. Nullam et ex et risus venenatis interdum. Nam euismod odio vel turpis dignissim, quis sodales purus sodales.</p>
@@ -81,15 +75,27 @@
         <p>Ut feugiat semper risus, vitae porttitor erat convallis eget. Integer ut arcu at ipsum elementum ultrices non nec nibh.</p>
     </div>
 
-    <!-- JavaScript: Kaydırma olayını dinleyerek başlığa sticky sınıfı ekleme/çıkarma -->
+    <!-- JavaScript: Kaydırma durumuna göre başlık hareketi ve boyut değiştirme -->
     <script>
         document.addEventListener('scroll', function() {
             const header = document.getElementById('main-header');
-            // Sayfa kaydırıldığında header yüksekliğinin yarısından fazlası geçildiyse "sticky" sınıfı ekle
-            if (window.scrollY > window.innerHeight / 2) {
-                header.classList.add('sticky');
-            } else {
+            const scrollY = window.scrollY;
+            const headerHeight = window.innerHeight;
+            const maxScaleReduction = 5 - 1.5; // 5rem'den 1.5rem'e
+
+            if (scrollY < headerHeight) {
+                // Başlık küçültme oranı
+                const fraction = scrollY / headerHeight;
+                const newSize = 5 - maxScaleReduction * fraction; // Rem cinsinden
+                header.style.fontSize = newSize + 'rem';
+                // Yukarı hareket için translate
+                header.style.transform = `translateY(-${scrollY}px)`;
                 header.classList.remove('sticky');
+            } else {
+                // Eşiğe gelindiğinde sticky sınıfını ekle
+                header.classList.add('sticky');
+                header.style.transform = 'none';
+                header.style.fontSize = '';
             }
         });
     </script>
