@@ -21,33 +21,36 @@
             overflow-x: hidden;
         }
 
-        /* Başlık (title) stil ve başlangıç konumu */
+        /* Başlık konteyneri */
         header {
             position: relative;
             width: 100%;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem; /* Büyük boyut */
-            font-weight: 700;
-            color: #fff;
-            text-align: center;
-            transform-origin: top center;
-            z-index: 10;
-            transition: font-size 0.1s ease-out;
         }
-
-        /* Sticky durumda başlık için sabit pozisyon ve küçük boyut */
-        header.sticky {
-            position: sticky;
+        /* Başlık metni */
+        header h1 {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: font-size 0.1s ease-out, top 0.1s ease-out;
+        }
+        /* Fixed durumdayken küçük ve sabit */
+        header h1.fixed {
+            position: fixed;
             top: 0;
-            font-size: 1.5rem; /* Küçük boyut */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
             background: rgba(0, 0, 0, 0.8);
             padding: 0.5rem 0;
+            z-index: 1000;
         }
 
-        /* İçerik bölümü (örnek metin) */
+        /* İçerik bölümü */
         .content {
             background-color: #111;
             padding: 2rem;
@@ -56,14 +59,15 @@
             line-height: 1.6;
             margin-bottom: 1rem;
         }
-
     </style>
 </head>
 <body>
-    <!-- Başlık bölümü -->
-    <header id="main-header">Ekrem Arda Gümüş</header>
+    <!-- Başlık -->
+    <header>
+        <h1 id="main-title">Ekrem Arda Gümüş</h1>
+    </header>
 
-    <!-- İçerik, sayfa kaydırıldığında başlığın davranışını test etmek için örnek metin -->
+    <!-- Örnek içerik -->
     <div class="content">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent hendrerit urna nec lorem commodo, vitae vulputate tortor faucibus. Sed quis urna non ex rutrum tincidunt. Curabitur dignissim velit sit amet ipsum malesuada scelerisque.</p>
         <p>Vestibulum vitae massa sit amet neque faucibus feugiat. Integer non dignissim tortor. Aliquam erat volutpat. Nullam et ex et risus venenatis interdum. Nam euismod odio vel turpis dignissim, quis sodales purus sodales.</p>
@@ -75,27 +79,36 @@
         <p>Ut feugiat semper risus, vitae porttitor erat convallis eget. Integer ut arcu at ipsum elementum ultrices non nec nibh.</p>
     </div>
 
-    <!-- JavaScript: Kaydırma durumuna göre başlık hareketi ve boyut değiştirme -->
+    <!-- JavaScript: scroll durumuna göre hareket ve küçülme -->
     <script>
-        document.addEventListener('scroll', function() {
-            const header = document.getElementById('main-header');
+        window.addEventListener('scroll', function() {
+            const title = document.getElementById('main-title');
             const scrollY = window.scrollY;
-            const headerHeight = window.innerHeight;
-            const maxScaleReduction = 5 - 1.5; // 5rem'den 1.5rem'e
+            const viewportHeight = window.innerHeight;
+            const startTop = viewportHeight / 2; // Başlangıç konumu: viewport'un yarısı
+            const startSize = 5; // rem
+            const endSize = 1.5; // rem
 
-            if (scrollY < headerHeight) {
-                // Başlık küçültme oranı
-                const fraction = scrollY / headerHeight;
-                const newSize = 5 - maxScaleReduction * fraction; // Rem cinsinden
-                header.style.fontSize = newSize + 'rem';
-                // Yukarı hareket için translate
-                header.style.transform = `translateY(-${scrollY}px)`;
-                header.classList.remove('sticky');
+            if (scrollY < viewportHeight) {
+                // Scroll oranını 0-1 arasında hesapla
+                const fraction = scrollY / viewportHeight;
+                // Yeni top (px)
+                const newTop = startTop - fraction * startTop;
+                // Yeni font boyutu (rem)
+                const newSize = startSize - (startSize - endSize) * fraction;
+                // Stil güncellemeleri
+                title.style.top = newTop + 'px';
+                title.style.fontSize = newSize + 'rem';
+                title.classList.remove('fixed');
+                title.style.position = 'absolute';
+                title.style.transform = 'translate(-50%, -50%)';
             } else {
-                // Eşiğe gelindiğinde sticky sınıfını ekle
-                header.classList.add('sticky');
-                header.style.transform = 'none';
-                header.style.fontSize = '';
+                // Eşik geçildiğinde fixed duruma geç
+                title.classList.add('fixed');
+                title.style.position = 'fixed';
+                title.style.top = '0';
+                title.style.fontSize = endSize + 'rem';
+                title.style.transform = 'translateX(-50%)';
             }
         });
     </script>
