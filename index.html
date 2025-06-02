@@ -364,7 +364,8 @@
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
                 for (let i = 0; i < numCircles; i++) {
-                    const radius = Math.random() * 50 + 120;
+                    const radius =
+                        ((Math.random() * 50 + 140) / 1920) * canvas.width;
                     const x =
                         Math.random() * (canvas.width - radius * 2) + radius;
                     const y =
