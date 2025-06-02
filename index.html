@@ -26,21 +26,21 @@
         }
         #textContainer {
             position: fixed;
-            inset: 0; /* shorthand for top, right, bottom, left = 0 */
-            z-index: 10; /* Above the canvas */
+            inset: 0;
+            z-index: 10;
             display: flex;
-            align-items: center; /* Initial vertical alignment */
-            justify-content: center; /* Horizontal alignment */
-            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition for alignment and padding */
-            pointer-events: none; /* Allows scrolling through the text container */
+            align-items: flex-start; /* Always align to start, JS will handle padding for centering/top */
+            justify-content: center; /* Horizontal centering */
+            pointer-events: none;
+            /* padding-top will be set by JS for smooth animation */
+            /* transition property removed to let JS control animation smoothly */
         }
         #mainText {
-            font-weight: 600; /* Bolder text */
+            font-weight: 600;
             text-align: center;
             color: white;
-            /* Initial font sizes are set by CSS media queries, JS will override for smooth transition */
-            /* transition: font-size removed as JS handles it smoothly */
             font-size: 4rem; /* Base fallback, will be set by media query or JS */
+            /* transition: font-size removed as JS handles it smoothly */
         }
         /* Responsive initial font sizes (before scroll) */
         @media (min-width: 640px) { /* sm */
@@ -53,38 +53,22 @@
             #mainText { font-size: 10rem; }
         }
 
-        /* Styles for when scrolled (container positioning) */
-        body.scrolled #textContainer {
-            align-items: flex-start; /* Align text to top */
-            padding-top: 2rem; /* 32px padding from top */
-        }
-        /* Target font sizes when scrolled (JS will interpolate to these) */
-        /* These specific font-size rules for body.scrolled #mainText are not strictly needed
-           if JS always calculates based on targetFinalActualFontSizePx, but kept for clarity/fallback. */
-        body.scrolled #mainText {
-            font-size: 1.875rem; /* 30px */
-        }
-        @media (min-width: 640px) { /* sm */
-            body.scrolled #mainText { font-size: 2.25rem; } /* 36px */
-        }
-        @media (min-width: 768px) { /* md */
-            body.scrolled #mainText { font-size: 3rem; } /* 48px */
-        }
-         @media (min-width: 1024px) { /* lg */
-            body.scrolled #mainText { font-size: 3rem; } /* 48px - same as md for scrolled */
-        }
+        /* Target font sizes when scrolled (JS will interpolate to these values) */
+        /* These CSS rules for body.scrolled #mainText are effectively reference points for JS,
+           but JS will calculate the pixel values directly. */
+        /* body.scrolled #mainText { font-size: 1.875rem; } ... etc. */
 
         /* Dummy scroll content to make page scrollable */
         .scroll-content {
-            height: 200vh; /* Makes the page scrollable */
-            pointer-events: auto; /* Re-enable pointer events for content if any */
+            height: 200vh;
+            pointer-events: auto;
         }
     </style>
 </head>
 <body>
     <canvas id="backgroundCanvas"></canvas>
     <div id="textContainer">
-        <h1 id="mainText">Ekrem Arda Gümüş</h1>
+        <h1 id="mainText">ekrem arda gümüş</h1>
     </div>
 
     <div class="scroll-content"></div>
@@ -92,17 +76,19 @@
     <script>
         const canvas = document.getElementById('backgroundCanvas');
         const ctx = canvas.getContext('2d');
-        const body = document.body;
+        const textContainer = document.getElementById('textContainer'); // Get textContainer
         const mainText = document.getElementById('mainText');
         
         let circles = [];
-        const numCircles = 25; // Slightly more circles for better effect
+        const numCircles = 15;
 
-        // Font sizing parameters
+        // Animation parameters
         let initialActualFontSizePx;
         let targetFinalActualFontSizePx;
-        const scrollTransitionRange = 300; // Pixels over which font size transition occurs
-        const scrollThreshold = 10; // Pixels to scroll before text container changes position
+        let initialPaddingTopPx;
+        let finalPaddingTopPx;
+
+        const scrollTransitionRange = 300; // Pixels over which text animation (size and position) occurs
 
         class Circle {
             constructor(x, y, radius, dx, dy, color) {
@@ -141,14 +127,13 @@
             canvas.height = window.innerHeight;
 
             for (let i = 0; i < numCircles; i++) {
-                const radius = Math.random() * 50 + 100; // Radius between 30 and 120
+                const radius = Math.random() * 90 + 30;
                 const x = Math.random() * (canvas.width - radius * 2) + radius;
                 const y = Math.random() * (canvas.height - radius * 2) + radius;
-                const dx = (Math.random() - 0.5) * 0.6; // Slightly adjusted speed
-                const dy = (Math.random() - 0.5) * 0.6; // Slightly adjusted speed
-                // Dark blue color with increased alpha for more appearance
-                const alpha = Math.random() * 0.3 + 0.5; // Alpha between 0.5 and 0.8
-                const color = `rgba(0, 35, 110, ${alpha})`; // Slightly brighter blue
+                const dx = (Math.random() - 0.5) * 0.6;
+                const dy = (Math.random() - 0.5) * 0.6;
+                const alpha = Math.random() * 0.3 + 0.5;
+                const color = `rgba(0, 35, 110, ${alpha})`;
                 circles.push(new Circle(x, y, radius, dx, dy, color));
             }
         }
@@ -162,7 +147,7 @@
         }
 
         function getTargetFinalFontSizePx() {
-            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize); // Get 1rem in px
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
             let targetRem;
             if (window.innerWidth >= 1024) targetRem = 3;       // lg scrolled
             else if (window.innerWidth >= 768) targetRem = 3;    // md scrolled
@@ -171,57 +156,59 @@
             return targetRem * rootFontSize;
         }
 
-        function updateFontSizingParameters() {
-            // Reset inline style to let CSS media queries define the initial size
-            mainText.style.fontSize = ''; 
-            
-            // To get the initial (unscrolled) font size, temporarily ensure body is not 'scrolled'
-            const wasScrolled = body.classList.contains('scrolled');
-            if (wasScrolled) {
-                body.classList.remove('scrolled');
-            }
+        function updateTextAnimationParameters() {
+            // --- Font Size Parameters ---
+            mainText.style.fontSize = ''; // Reset inline style to let CSS media queries define the initial size
             initialActualFontSizePx = parseFloat(getComputedStyle(mainText).fontSize);
-            if (wasScrolled) { // Restore class if it was there
-                body.classList.add('scrolled');
-            }
-
             targetFinalActualFontSizePx = getTargetFinalFontSizePx();
+
+            // --- Positioning (Padding-Top) Parameters ---
+            // Ensure mainText has its initial font size applied for accurate height measurement
+            mainText.style.fontSize = initialActualFontSizePx + 'px'; 
+            const initialMainTextHeight = mainText.offsetHeight;
+
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            finalPaddingTopPx = 2 * rootFontSize; // Target 2rem padding from top
+
+            // Calculate initial padding to center the text vertically
+            initialPaddingTopPx = (window.innerHeight / 2) - (initialMainTextHeight / 2);
+            initialPaddingTopPx = Math.max(0, initialPaddingTopPx); // Ensure padding isn't negative
+
+            // After parameters are set, handleScrollAndResize will apply the correct current styles
         }
 
         function handleScrollAndResize() {
             const scrollY = window.scrollY;
+            const scrollFraction = Math.min(1, scrollY / scrollTransitionRange);
 
-            // 1. Text container positioning (class-based for stickiness)
-            if (scrollY > scrollThreshold) {
-                body.classList.add('scrolled');
-            } else {
-                body.classList.remove('scrolled');
+            // 1. Font size interpolation
+            if (initialActualFontSizePx != null && targetFinalActualFontSizePx != null) {
+                let currentPxSize = initialActualFontSizePx - (initialActualFontSizePx - targetFinalActualFontSizePx) * scrollFraction;
+                currentPxSize = Math.max(targetFinalActualFontSizePx, Math.min(initialActualFontSizePx, currentPxSize));
+                mainText.style.fontSize = currentPxSize + 'px';
             }
 
-            // 2. Font size interpolation
-            if (initialActualFontSizePx && targetFinalActualFontSizePx) {
-                let scrollFraction = Math.min(1, scrollY / scrollTransitionRange);
-                let currentPxSize = initialActualFontSizePx - (initialActualFontSizePx - targetFinalActualFontSizePx) * scrollFraction;
-                // Ensure font size doesn't go below the target minimum or above initial maximum
-                currentPxSize = Math.max(targetFinalActualFontSizePx, currentPxSize);
-                currentPxSize = Math.min(initialActualFontSizePx, currentPxSize);
-                mainText.style.fontSize = currentPxSize + 'px';
+            // 2. Padding-Top interpolation for textContainer
+            if (initialPaddingTopPx != null && finalPaddingTopPx != null) {
+                let currentPaddingTop = initialPaddingTopPx - (initialPaddingTopPx - finalPaddingTopPx) * scrollFraction;
+                currentPaddingTop = Math.max(finalPaddingTopPx, Math.min(initialPaddingTopPx, currentPaddingTop));
+                textContainer.style.paddingTop = currentPaddingTop + 'px';
             }
         }
 
         // Event Listeners
         window.addEventListener('scroll', handleScrollAndResize);
         window.addEventListener('resize', () => {
-            initCircles(); // Reinitialize circles and canvas dimensions
-            updateFontSizingParameters(); // Recalculate font size parameters
-            handleScrollAndResize(); // Apply scroll/resize dependent styles immediately
+            initCircles(); 
+            updateTextAnimationParameters(); 
+            handleScrollAndResize(); 
         });
 
         // Initial setup
         initCircles();
-        updateFontSizingParameters();
+        updateTextAnimationParameters(); // Calculate all necessary animation parameters
         animateCircles();
-        handleScrollAndResize(); // Set initial state based on current scroll/size
+        handleScrollAndResize(); // Apply initial styles based on current scroll/size
     </script>
 </body>
 </html>
