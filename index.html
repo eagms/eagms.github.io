@@ -1,116 +1,182 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ekrem Arda Gümüş</title>
-    <!-- Inter font import -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Genel sıfırlamalar */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            background-color: #000;
+        body {
+            background-color: #000000;
+            color: #ffffff;
             font-family: 'Inter', sans-serif;
-            color: #fff;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevents horizontal scrollbar from blur */
+            margin: 0;
         }
-
-        /* Başlık konteyneri */
-        header {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-        }
-        /* Başlık metni */
-        header h1 {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 5rem;
-            font-weight: 700;
-            white-space: nowrap;
-            transition: font-size 0.1s ease-out, top 0.1s ease-out;
-        }
-        /* Fixed durumdayken küçük ve sabit */
-        header h1.fixed {
+        #backgroundCanvas {
             position: fixed;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.5rem;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 0.5rem 0;
-            z-index: 1000;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind the text */
+            filter: blur(60px); /* Heavy blur effect */
+            opacity: 0.7; /* Slight transparency for the circles layer */
         }
-
-        /* İçerik bölümü */
-        .content {
-            background-color: #111;
-            padding: 2rem;
+        #textContainer {
+            position: fixed;
+            inset: 0; /* shorthand for top, right, bottom, left = 0 */
+            z-index: 10; /* Above the canvas */
+            display: flex;
+            align-items: center; /* Initial vertical alignment */
+            justify-content: center; /* Horizontal alignment */
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition for alignment and padding */
+            pointer-events: none; /* Allows scrolling through the text container */
         }
-        .content p {
-            line-height: 1.6;
-            margin-bottom: 1rem;
+        #mainText {
+            font-weight: 900; /* Bolder text */
+            text-align: center;
+            color: white;
+            transition: font-size 0.7s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition for font size */
+            /* Initial font sizes, responsive */
+            font-size: 4rem; /* 64px */
+        }
+        @media (min-width: 640px) { /* sm */
+            #mainText { font-size: 6rem; } /* 96px */
+        }
+        @media (min-width: 768px) { /* md */
+            #mainText { font-size: 8rem; } /* 128px */
+        }
+        @media (min-width: 1024px) { /* lg */
+            #mainText { font-size: 10rem; } /* 160px */
+        }
+        /* Styles for when scrolled */
+        body.scrolled #textContainer {
+            align-items: flex-start; /* Align text to top */
+            padding-top: 2rem; /* 32px padding from top */
+        }
+        body.scrolled #mainText {
+            /* Scrolled font sizes, responsive */
+            font-size: 1.875rem; /* 30px */
+        }
+        @media (min-width: 640px) { /* sm */
+            body.scrolled #mainText { font-size: 2.25rem; } /* 36px */
+        }
+        @media (min-width: 768px) { /* md */
+            body.scrolled #mainText { font-size: 3rem; } /* 48px */
+        }
+        /* Dummy scroll content to make page scrollable */
+        .scroll-content {
+            height: 200vh; /* Makes the page scrollable */
+            pointer-events: auto; /* Re-enable pointer events for content if any */
         }
     </style>
 </head>
 <body>
-    <!-- Başlık -->
-    <header>
-        <h1 id="main-title">Ekrem Arda Gümüş</h1>
-    </header>
-
-    <!-- Örnek içerik -->
-    <div class="content">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent hendrerit urna nec lorem commodo, vitae vulputate tortor faucibus. Sed quis urna non ex rutrum tincidunt. Curabitur dignissim velit sit amet ipsum malesuada scelerisque.</p>
-        <p>Vestibulum vitae massa sit amet neque faucibus feugiat. Integer non dignissim tortor. Aliquam erat volutpat. Nullam et ex et risus venenatis interdum. Nam euismod odio vel turpis dignissim, quis sodales purus sodales.</p>
-        <p>Morbi sit amet purus sed enim scelerisque laoreet. Nulla facilisi. Vivamus vel tellus vitae sapien consequat egestas. Duis bibendum urna ac lectus suscipit, a vestibulum sapien elementum.</p>
-        <p>Fusce euismod, sapien in finibus dapibus, velit ligula vehicula metus, at pellentesque eros orci id mi. Quisque id orci nec lacus scelerisque dictum nec sit amet purus. Integer vehicula pretium dolor, ac dapibus ligula blandit non.</p>
-        <p>Donec ullamcorper nibh elit, vitae commodo lacus consequat quis. Aenean euismod lorem vitae dolor sodales, non vestibulum elit dignissim. Mauris suscipit, turpis elementum maximus aliquet, urna nisl vulputate nunc, ac tempus mi felis sed nibh.</p>
-        <p>Suspendisse potenti. Curabitur suscipit massa non sapien facilisis convallis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Phasellus et ipsum vitae lorem bibendum hendrerit.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ac nulla sed augue fringilla luctus. Curabitur at metus vehicula, pharetra massa eget, tempus sapien.</p>
-        <p>Ut feugiat semper risus, vitae porttitor erat convallis eget. Integer ut arcu at ipsum elementum ultrices non nec nibh.</p>
+    <canvas id="backgroundCanvas"></canvas>
+    <div id="textContainer">
+        <h1 id="mainText">Ekrem Arda Gümüş</h1>
     </div>
 
-    <!-- JavaScript: scroll durumuna göre hareket ve küçülme -->
-    <script>
-        window.addEventListener('scroll', function() {
-            const title = document.getElementById('main-title');
-            const scrollY = window.scrollY;
-            const viewportHeight = window.innerHeight;
-            const startTop = viewportHeight / 2; // Başlangıç konumu: viewport'un yarısı
-            const startSize = 5; // rem
-            const endSize = 1.5; // rem
+    <div class="scroll-content"></div>
 
-            if (scrollY < viewportHeight) {
-                // Scroll oranını 0-1 arasında hesapla
-                const fraction = scrollY / viewportHeight;
-                // Yeni top (px)
-                const newTop = startTop - fraction * startTop;
-                // Yeni font boyutu (rem)
-                const newSize = startSize - (startSize - endSize) * fraction;
-                // Stil güncellemeleri
-                title.style.top = newTop + 'px';
-                title.style.fontSize = newSize + 'rem';
-                title.classList.remove('fixed');
-                title.style.position = 'absolute';
-                title.style.transform = 'translate(-50%, -50%)';
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        let circles = [];
+        const numCircles = 20; // Number of circles
+
+        // Circle class
+        class Circle {
+            constructor(x, y, radius, dx, dy, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.dx = dx;
+                this.dy = dy;
+                this.color = color;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            update() {
+                // Bounce off edges
+                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                    this.dx = -this.dx;
+                }
+                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+                    this.dy = -this.dy;
+                }
+
+                this.x += this.dx;
+                this.y += this.dy;
+
+                this.draw();
+            }
+        }
+
+        function initCircles() {
+            circles = [];
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            for (let i = 0; i < numCircles; i++) {
+                const radius = Math.random() * 80 + 40; // Radius between 40 and 120
+                const x = Math.random() * (canvas.width - radius * 2) + radius;
+                const y = Math.random() * (canvas.height - radius * 2) + radius;
+                const dx = (Math.random() - 0.5) * 0.5; // Slow horizontal speed
+                const dy = (Math.random() - 0.5) * 0.5; // Slow vertical speed
+                // Dark blue color with random alpha for some variation
+                const alpha = Math.random() * 0.4 + 0.2; // Alpha between 0.2 and 0.6
+                const color = `rgba(0, 30, 100, ${alpha})`; 
+                circles.push(new Circle(x, y, radius, dx, dy, color));
+            }
+        }
+
+        function animateCircles() {
+            requestAnimationFrame(animateCircles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas each frame
+
+            circles.forEach(circle => {
+                circle.update();
+            });
+        }
+
+        // Scroll behavior for text
+        const body = document.body;
+        const textContainer = document.getElementById('textContainer');
+        const mainText = document.getElementById('mainText');
+        const scrollThreshold = 10; // Pixels to scroll before text changes
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > scrollThreshold) {
+                body.classList.add('scrolled');
             } else {
-                // Eşik geçildiğinde fixed duruma geç
-                title.classList.add('fixed');
-                title.style.position = 'fixed';
-                title.style.top = '0';
-                title.style.fontSize = endSize + 'rem';
-                title.style.transform = 'translateX(-50%)';
+                body.classList.remove('scrolled');
             }
         });
+
+        // Resize canvas and reinitialize circles on window resize
+        window.addEventListener('resize', () => {
+            initCircles();
+        });
+
+        // Initial setup
+        initCircles();
+        animateCircles();
+
+        // Set initial state based on scroll position (e.g., if page reloads scrolled)
+        if (window.scrollY > scrollThreshold) {
+            body.classList.add('scrolled');
+        }
+
     </script>
 </body>
 </html>
